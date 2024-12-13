@@ -1,0 +1,22 @@
+{
+  "name": "dataform_code",
+  "version": "1.0.0",
+  "description": "inget vettigt här Men provar att ändra en rad från Dataform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moaholm/dataform.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/moaholm/dataform/issues"
+  },
+  "homepage": "https://github.com/moaholm/dataform#readme",
+  "dependencies": {
+    "@dataform/core": "^3.0.8"
+  }
+}
