@@ -1,0 +1,7 @@
+{
+    "defaultSchema" : "dataform",
+    "assertionSchema" : "dataform_assertions",
+    "warehouse" : "bigquery",
+    "defaultDatabase" : "data-evolution-moa",
+    "defaultLocation" : "us-west2"
+}
