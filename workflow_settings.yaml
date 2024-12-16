@@ -1,5 +1,5 @@
 dataformCoreVersion: 3.0.8
 defaultProject: data-evolution-moa
 defaultLocation: us-west2
-defaultDataset: dataform
+defaultDataset: raw_wwi
 defaultAssertionDataset: dataform_assertions

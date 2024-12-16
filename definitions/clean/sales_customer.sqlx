@@ -1,0 +1,15 @@
+config {
+    type: "view",
+    name: "sales-customers",
+    schema: "clean",
+    description: "a clena layer of sales-customers"
+}
+
+SELECT
+    customerID AS customer_id,
+    customerCategoryID AS customer_category_id,
+    customerName AS customer_name,
+    accountOpenedDate AS account_opened_date,
+    deliveryPostalCode AS delivery_postal_code
+FROM
+    ${ref("raw_wwi", "customers")}
