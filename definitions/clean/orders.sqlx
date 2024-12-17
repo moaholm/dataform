@@ -1,0 +1,17 @@
+config {
+    type: "view",
+    name: "orders",
+    schema: "clean",
+    description: "a clean view of orders: customer_id, invoice_id, total_order_sum, invoice_date"
+}
+
+SELECT
+    orders.customerID,
+    orders.invoiceID,
+    SUM(CAST(order_information.quantity AS FLOAT64) * CAST(order_information.unitPrice AS FLOAT64)) AS total_sum,
+    orders.invoiceDate,
+  FROM
+    ${ref("raw_wwi", "invoices")} AS orders
+  INNER JOIN ${ref("raw_wwi", "invoiceLines")} AS order_information ON orders.invoiceID = order_information.invoiceID
+  GROUP BY 1, 2, 4
+  LIMIT 100
