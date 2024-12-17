@@ -2,7 +2,7 @@ config {
     type: "view",
     name: "sales-customers",
     schema: "clean",
-    description: "a clena layer of sales-customers"
+    description: "a clean layer of sales-customers"
 }
 
 SELECT
