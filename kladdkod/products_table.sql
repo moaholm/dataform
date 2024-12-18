@@ -1,6 +1,3 @@
-SELECT
-    products.stockItemID AS productID,
-
 WITH Step1 AS(
     SELECT
     products.stockItemID AS productID,
