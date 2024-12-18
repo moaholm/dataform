@@ -1,0 +1,17 @@
+config {
+    type: "table",
+    name: "orderItems",
+    schema: "clean",
+    description: "a clean table of order items"
+}
+SELECT
+    order_information.invoiceLineID AS orderItemsID,
+    orders.invoiceID AS orderID,
+    order_information.stockItemID AS productID,
+    order_information.quantity,
+    order_information.unitPrice,
+    SUM(CAST(order_information.quantity AS FLOAT64) * CAST(order_information.unitPrice AS FLOAT64)) AS subtotal
+  FROM
+    ${ref("raw_wwi", "invoices")} AS orders
+  INNER JOIN ${ref("raw_wwi", "invoiceLines")} AS order_information ON orders.invoiceID = order_information.invoiceID
+  GROUP BY 1, 2, 3, 4, 5
