@@ -1,6 +1,0 @@
-config {
-    type: "declaration",
-    database: "data-evolution-moa",
-    schema: "raw_wwi",
-    name: "invoices"
-}

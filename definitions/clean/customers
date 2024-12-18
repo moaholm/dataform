@@ -1,0 +1,17 @@
+config {
+    type: "view",
+    name: "customers",
+    schema: "clean",
+    description: "a clean layer of customers"
+}
+
+SELECT
+    customerID,
+    customerName
+    phoneNumber,
+    deliveryAddressLine1 AS addressLine1,
+    deliveryAddressLine2 AS addressLine2,
+    deliveryPostalCode AS postalCode,
+    REGEXP_EXTRACT(customerName, r'\(([^)]+)\)') AS city
+FROM
+    ${ref("raw_wwi", "customers")}
