@@ -1,5 +1,5 @@
 config {
-    type: "view",
+    type: "table",
     name: "orders",
     schema: "clean",
     description: "a clean view of orders: customer_id, invoice_id, total_order_sum, invoice_date"
