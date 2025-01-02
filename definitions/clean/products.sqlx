@@ -9,8 +9,8 @@ SELECT
     si.stockItemName AS productName,
     CAST(si.unitPrice AS FLOAT64) AS unitPrice,
     CAST(si.recommendedRetailPrice AS FLOAT64) AS salesPrice,
-    sg.stockGroupID AS groupID,
-    sg.stockGroupName AS groupName
+    sg.stockGroupID AS categoryID,
+    sg.stockGroupName AS categoryName
 FROM
     ${ref("raw_wwi", "stockItem")} AS si
 INNER JOIN
