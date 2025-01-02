@@ -1,0 +1,27 @@
+config {
+    type: "table",
+    name: "products",
+    schema: "clean",
+    description: "a clean table of products"
+}
+
+WITH Step1 AS(
+    SELECT
+    products.stockItemID AS productID PRIMARY KEY,
+    category.stockGroupID AS categoryID,
+    category.stockGroupName AS categoryName
+    
+FROM ${ref("raw_wwi", "stockGroups")} AS category
+INNER JOIN ${ref("raw_wwi", "stockItemStockGroup")}AS products 
+ON category.stockGroupID = products.stockGroupID
+)
+    SELECT
+    s1.productID,
+    productInformation.stockItemName,
+    productInformation.unitPrice,
+    productInformation.recommendedRetailPrice,
+    s1.categoryID,
+    s1.categoryName
+FROM ${ref("raw_wwi","stockItem")} AS productInformation
+INNER JOIN Step1 AS s1
+ON s1.productID = productInformation.stockItemID
