@@ -9,7 +9,7 @@ SELECT
     orders.invoiceID AS orderID,
     orders.customerID,
     SUM(CAST(order_information.quantity AS FLOAT64) * CAST(order_information.unitPrice AS FLOAT64)) AS totalSum,
-    orders.invoiceDate,
+    CAST(orders.invoiceDate AS DATE) AS orderDate
   FROM
     ${ref("raw_wwi", "invoices")} AS orders
   INNER JOIN ${ref("raw_wwi", "invoiceLines")} AS order_information ON orders.invoiceID = order_information.invoiceID
