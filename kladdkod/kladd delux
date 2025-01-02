@@ -1,0 +1,289 @@
+SELECT 
+    DATE(o.invoiceDate) AS period,
+    SUM(CAST(oi.quantity AS FLOAT64)) AS total_products_sold,
+    SUM(oi.subtotal) AS total_revenue,
+    SUM(oi.subtotal - (oi.quantity * p.recommendedRetailPrice)) AS total_profit,
+    COUNT(DISTINCT o.customerID) AS unique_customers
+FROM 
+    `clean.orders` o
+JOIN 
+    `clean.orderItems` oi ON o.orderID = oi.orderID
+JOIN 
+    `clean.products` p ON oi.productID = p.productId
+GROUP BY 
+    DATE(o.invoiceDate)
+ORDER BY 
+    period;
+
+----- Första Mart tabellen. Pausar för att jag behöver göra rent mitt clean lager. ----
+
+1. Försäljningssammanfattning per tidsperiod
+Ett faktatabell (fact table) med data som summerar försäljningen över tid. Tidsdimensionen kan vara på daglig, veckovis, månadsvis eller årsvis nivå.
+
+Kolumner:
+
+Datum (date, månad, år, kvartal)
+Totalt antal sålda produkter
+Total försäljning (subtotal i Order_Items)
+Totala vinsten (Total försäljning - Total inköpskostnad baserat på purchasePrice)
+Antal unika kunder
+Syfte:
+
+Analysera försäljningstrender över tid, exempelvis bästa månader, veckodagar, eller perioder.
+
+2. Produktförsäljningsanalys
+Ett mart-lager för att spåra vilka produkter som säljer bäst.
+
+Kolumner:
+
+Produkt-ID (productId)
+Produktnamn
+Kategori (categoryName)
+Sålda enheter (summering av quantity)
+Totala intäkter (summering av subtotal)
+Totala inköpskostnader (summering av quantity * purchasePrice)
+Vinsten (Totala intäkter - Totala inköpskostnader)
+Syfte:
+
+Identifiera storsäljare, lågpresterande produkter och kategorier med hög vinstmarginal.
+
+3. Kundanalys
+Ett mart-lager för att analysera kunder och deras köpbeteende.
+
+Kolumner:
+
+Kund-ID (customerID)
+Kundnamn (för- och efternamn)
+Totalt antal köp (antal orderNumber)
+Totalt spenderat belopp (summering av totalAmount från Orders)
+Snittköp per order (TotalAmount / antal ordrar)
+Postnummer (zipCode)
+Syfte:
+
+Segmentera kunder baserat på köpvanor, identifiera högvärdeskunder och geografiska områden som köper mest.
+
+4. Försäljning per geografisk plats
+Ett mart-lager för att analysera försäljning baserat på kundernas geografiska plats.
+
+Kolumner:
+
+Stad (city)
+Postnummer (zipCode)
+Antal sålda enheter (summering av quantity)
+Totala intäkter (summering av subtotal i Order_Items)
+Antal kunder (antal unika customerID)
+Syfte:
+
+Identifiera områden med högst försäljning och analysera regionala försäljningstrender.
+
+5. Orderanalys
+Ett mart-lager för detaljerad orderanalys.
+
+Kolumner:
+
+Ordernummer (orderNumber)
+Orderdatum (orderDate)
+Kund-ID (customerID)
+Totala intäkter per order (totalAmount från Orders)
+Antal produkter i ordern (summering av quantity från Order_Items)
+Genomsnittligt pris per produkt (totalAmount / antal produkter)
+Syfte:
+
+Analysera orderstorlekar, genomsnittligt ordervärde och toppkunder baserat på ordervolym.
+
+6. Mått och KPI:er
+Dessa mart-tabeller kan användas för att beräkna och visualisera nyckeltal:
+
+Total försäljning: Summa av subtotal i Order_Items.
+Genomsnittligt ordervärde: TotalAmount / antal ordrar.
+Vinstmarginal: (Totala intäkter - Totala inköpskostnader) / Totala intäkter.
+Retentionsgrad: Andel återkommande kunder (kunder med fler än 1 order).
+Teknik att implementera
+ETL-process (Extract, Transform, Load):
+Extrahera data från din ursprungsdatabas (exempelvis Orders, Order_Items, Products, och Customers).
+Transformera data till aggregerade mått.
+Ladda in den till din datamart.
+Visualisering:
+Använd verktyg som Power BI, Tableau, eller Excel för att bygga dashboards och rapporter.
+Vill du ha hjälp med att skapa SQL-frågor för någon av dessa tabeller? 😊
+
+
+
+
+
+
+Du sade:
+Ja, hur ser sql-frågorna ut till dessa? :)
+ChatGPT sade:
+
+ChatGPT
+Här kommer SQL-frågorna för att skapa och fylla tabeller för varje del av ditt mart-lager. Dessa frågor är anpassade för ditt schema och kan användas i exempelvis MySQL eller PostgreSQL (med små justeringar om nödvändigt).
+
+1. Försäljningssammanfattning per tidsperiod
+-- Skapa tabell för försäljningssammanfattning
+CREATE TABLE SalesSummary (
+    period DATE,
+    total_products_sold INT,
+    total_revenue DECIMAL(10, 2),
+    total_profit DECIMAL(10, 2),
+    unique_customers INT
+);
+
+-- Fyll tabellen med data
+INSERT INTO SalesSummary (period, total_products_sold, total_revenue, total_profit, unique_customers)
+SELECT 
+    DATE(o.orderDate) AS period,
+    SUM(oi.quantity) AS total_products_sold,
+    SUM(oi.subtotal) AS total_revenue,
+    SUM(oi.subtotal - (oi.quantity * p.purchasePrice)) AS total_profit,
+    COUNT(DISTINCT o.customerID) AS unique_customers
+FROM 
+    Orders o
+JOIN 
+    Order_Items oi ON o.orderNumber = oi.orderNumber
+JOIN 
+    Products p ON oi.productId = p.productId
+GROUP BY 
+    DATE(o.orderDate)
+ORDER BY 
+    period;
+2. Produktförsäljningsanalys
+-- Skapa tabell för produktförsäljning
+CREATE TABLE ProductSales (
+    productId INT,
+    productName VARCHAR(255),
+    categoryName VARCHAR(255),
+    total_units_sold INT,
+    total_revenue DECIMAL(10, 2),
+    total_cost DECIMAL(10, 2),
+    total_profit DECIMAL(10, 2)
+);
+
+-- Fyll tabellen med data
+INSERT INTO ProductSales (productId, productName, categoryName, total_units_sold, total_revenue, total_cost, total_profit)
+SELECT 
+    p.productId,
+    p.productName,
+    p.categoryName,
+    SUM(oi.quantity) AS total_units_sold,
+    SUM(oi.subtotal) AS total_revenue,
+    SUM(oi.quantity * p.purchasePrice) AS total_cost,
+    SUM(oi.subtotal - (oi.quantity * p.purchasePrice)) AS total_profit
+FROM 
+    Products p
+JOIN 
+    Order_Items oi ON p.productId = oi.productId
+GROUP BY 
+    p.productId, p.productName, p.categoryName
+ORDER BY 
+    total_revenue DESC;
+3. Kundanalys
+-- Skapa tabell för kundanalys
+CREATE TABLE CustomerAnalysis (
+    customerId INT,
+    customerName VARCHAR(255),
+    total_orders INT,
+    total_spent DECIMAL(10, 2),
+    average_order_value DECIMAL(10, 2),
+    zipCode VARCHAR(20)
+);
+
+-- Fyll tabellen med data
+INSERT INTO CustomerAnalysis (customerId, customerName, total_orders, total_spent, average_order_value, zipCode)
+SELECT 
+    c.customerID,
+    CONCAT(c.firstName, ' ', c.lastName) AS customerName,
+    COUNT(o.orderNumber) AS total_orders,
+    SUM(o.totalAmount) AS total_spent,
+    AVG(o.totalAmount) AS average_order_value,
+    c.zipCode
+FROM 
+    Customers c
+JOIN 
+    Orders o ON c.customerID = o.customerID
+GROUP BY 
+    c.customerID, c.firstName, c.lastName, c.zipCode
+ORDER BY 
+    total_spent DESC;
+4. Försäljning per geografisk plats
+-- Skapa tabell för försäljning per geografisk plats
+CREATE TABLE GeographicSales (
+    city VARCHAR(255),
+    zipCode VARCHAR(20),
+    total_units_sold INT,
+    total_revenue DECIMAL(10, 2),
+    total_customers INT
+);
+
+-- Fyll tabellen med data
+INSERT INTO GeographicSales (city, zipCode, total_units_sold, total_revenue, total_customers)
+SELECT 
+    c.city,
+    c.zipCode,
+    SUM(oi.quantity) AS total_units_sold,
+    SUM(oi.subtotal) AS total_revenue,
+    COUNT(DISTINCT c.customerID) AS total_customers
+FROM 
+    Customers c
+JOIN 
+    Orders o ON c.customerID = o.customerID
+JOIN 
+    Order_Items oi ON o.orderNumber = oi.orderNumber
+GROUP BY 
+    c.city, c.zipCode
+ORDER BY 
+    total_revenue DESC;
+5. Orderanalys
+-- Skapa tabell för orderanalys
+CREATE TABLE OrderAnalysis (
+    orderNumber INT,
+    orderDate DATE,
+    customerId INT,
+    total_revenue DECIMAL(10, 2),
+    total_products INT,
+    average_price_per_product DECIMAL(10, 2)
+);
+
+-- Fyll tabellen med data
+INSERT INTO OrderAnalysis (orderNumber, orderDate, customerId, total_revenue, total_products, average_price_per_product)
+SELECT 
+    o.orderNumber,
+    o.orderDate,
+    o.customerID,
+    o.totalAmount AS total_revenue,
+    SUM(oi.quantity) AS total_products,
+    AVG(oi.unitPrice) AS average_price_per_product
+FROM 
+    Orders o
+JOIN 
+    Order_Items oi ON o.orderNumber = oi.orderNumber
+GROUP BY 
+    o.orderNumber, o.orderDate, o.customerID, o.totalAmount
+ORDER BY 
+    o.orderDate;
+6. KPI:er och nyckeltal
+Vill du bara hämta nyckeltal och inte skapa nya tabeller kan du använda aggregerande frågor direkt i rapporteringsverktyg:
+
+Total försäljning:
+
+SELECT SUM(subtotal) AS total_sales FROM Order_Items;
+Genomsnittligt ordervärde:
+
+SELECT AVG(totalAmount) AS avg_order_value FROM Orders;
+Vinstmarginal:
+
+SELECT 
+    (SUM(oi.subtotal) - SUM(oi.quantity * p.purchasePrice)) / SUM(oi.subtotal) AS profit_margin
+FROM 
+    Order_Items oi
+JOIN 
+    Products p ON oi.productId = p.productId;
+Andel återkommande kunder:
+
+SELECT 
+    (COUNT(DISTINCT CASE WHEN order_count > 1 THEN customerID END) * 100.0 / COUNT(DISTINCT customerID)) AS repeat_customer_rate
+FROM (
+    SELECT customerID, COUNT(orderNumber) AS order_count
+    FROM Orders
+    GROUP BY customerID
+) subquery;
