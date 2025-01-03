@@ -1,3 +1,18 @@
+Anteckningar: 
+
+Efter mycket om och men för att fastställa försäljningspris och inköpspris (för att beräkna profit),
+har jag kommit fram till att man nog behöver "ta en omväg" för att den exakta datan jag önskar inte finns. 
+Jag hade önskat i tex stockItem tabellen att det fanns attributen purchasePrice och salesPrice. Det gör det inte...
+
+För att kolla vinst kollar vi på invoiceLines där attributet "lineProfit" säger hur mycket vi tjänat på produkten.
+Det skiljer sig från försäljning till försäljning, ibland handlar det om negativa siffror, vad kan det bero på?
+Lol, jo det beror på att det blivit något galet i datan... Unit price har råkat bli 3.20 istället för 32.0...
+Vad gör vi åt det? 
+
+Jag tänker mig att vi kolla på profit för sig och loss för sig? Med brasklappen att det kanske inte handlar om förluster? Eller? idk 
+
+
+
 SELECT 
     DATE(o.invoiceDate) AS period,
     SUM(CAST(oi.quantity AS FLOAT64)) AS total_products_sold,
