@@ -1,0 +1,19 @@
+config {
+    type: "table",
+    name: "productSales",
+    schema: "mart",
+    description: "a tabel of products and their total sales."
+}
+SELECT
+    p.productID,
+    p.productName,
+    p.categoryName,
+    SUM(oi.quantity) AS totalSoldItem,
+    SUM(oi.subtotal) AS totalRevenue,
+    SUM(oi.quantity * oi.salesPrice) AS totalPurchasePrice, -- det här är fel! Vi vill ha purchasePrice
+    SUM(oi.subtotal - (oi.quantity * oi.unitPrice)) AS totalProfit
+FROM ${ref("clean", "products")} AS p
+JOIN ${ref("clean", "orderItems")} AS oi ON p.productID = oi.productID
+WHERE p.productID = oi.productID
+GROUP BY 1, 2, 3
+ORDER BY totalRevenue DESC
