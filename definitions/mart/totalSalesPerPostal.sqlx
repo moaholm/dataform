@@ -1,0 +1,16 @@
+config {
+    type: "table",
+    name: "totalSalesPerPostal",
+    schema: "mart",
+    description: "information on total sales for in geographic location, postalCode"
+}
+SELECT 
+customers.postalCode, 
+customers.city,
+SUM(orders.quantity) AS totalNrOfOrderedItems,
+ROUND(SUM(orders.subtotalProfit),3) AS subtotalProfit,
+COUNT(orders.customerID) AS nrOfCustomers
+FROM ${ref("clean","customers")} AS customers
+JOIN ${ref("clean", "orders")} AS orders ON customers.customerID = orders.customerID
+GROUP BY postalCode, city
+ORDER BY postalCode DESC
