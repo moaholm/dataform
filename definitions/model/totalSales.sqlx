@@ -1,7 +1,7 @@
 config {
     type: "table",
     name: "totalSales",
-    schema: "mart",
+    schema: "model",
     description: "information on total sales on specific date and what product"
 }
 SELECT
