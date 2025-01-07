@@ -1,16 +1,21 @@
 config {
     type: "table",
-    name: "orders",
+    name: "orderItems",
     schema: "clean",
-    description: "a clean table of orders: customer_id, invoice_id, total_order_sum, invoice_date"
+    description: "a clean table of order items"
 }
-
 SELECT
+    order_information.invoiceLineID AS orderItemsID,
     orders.invoiceID AS orderID,
     orders.customerID,
-    SUM(CAST(order_information.quantity AS FLOAT64) * CAST(order_information.unitPrice AS FLOAT64)) AS totalSum,
-    CAST(orders.invoiceDate AS DATE) AS orderDate
+    order_information.stockItemID AS productID,
+    CAST(orders.invoiceDate AS DATE) AS orderDate,
+    CAST(order_information.quantity AS INT64) AS quantity,
+    CAST(order_information.unitPrice AS FLOAT64) AS unitPrice,
+    CAST(order_information.lineProfit AS FLOAT64) AS unitProfit,
+    SUM(CAST(order_information.quantity AS FLOAT64) * CAST(order_information.lineProfit AS FLOAT64)) AS subtotalProfit
   FROM
     ${ref("raw_wwi", "invoices")} AS orders
   INNER JOIN ${ref("raw_wwi", "invoiceLines")} AS order_information ON orders.invoiceID = order_information.invoiceID
-  GROUP BY 1, 2, 4
+  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+  ORDER BY productID
