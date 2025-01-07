@@ -1,0 +1,18 @@
+config {
+    type: "table",
+    name: "totalSalesPerCustomer",
+    schema: "mart",
+    description: "information on total sales for each customer"
+}
+SELECT
+customers.customerID,
+customers.customerName,
+customers.postalCode,
+SUM(orders.quantity) AS totalNrOfItems,
+COUNT(customers.customerID) AS totalNrOfOrders,
+ROUND(SUM(orders.subtotalProfit) / COUNT(orders.customerID), 3) AS averageProfitPerOrder,
+SUM(orders.subtotalProfit) AS totalProfitOnCustomer
+FROM ${ref("clean", "customers")} AS customers
+JOIN ${ref("clean", "orders")} AS orders ON orders.customerID = customers.customerID
+GROUP BY customerID, customerName, postalCode
+ORDER BY customerID
