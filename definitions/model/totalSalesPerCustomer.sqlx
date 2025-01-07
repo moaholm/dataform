@@ -1,7 +1,7 @@
 config {
     type: "table",
     name: "totalSalesPerCustomer",
-    schema: "mart",
+    schema: "model",
     description: "information on total sales for each customer"
 }
 SELECT
