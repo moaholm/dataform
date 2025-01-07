@@ -1,6 +1,6 @@
 config {
     type: "table",
-    name: "orderItems",
+    name: "orders",
     schema: "clean",
     description: "a clean table of order items"
 }
