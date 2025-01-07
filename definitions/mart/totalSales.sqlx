@@ -1,0 +1,14 @@
+config {
+    type: "table",
+    name: "totalSales",
+    schema: "mart",
+    description: "information on total sales on specific date and what product"
+}
+SELECT
+productID,
+COUNT(productID) AS totalItemsSold,
+SUM (unitProfit) AS totalProfit,
+orderDate
+FROM ${ref("clean", "orders")}
+GROUP BY productID, orderDate
+ORDER BY productID

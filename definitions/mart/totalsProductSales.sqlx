@@ -1,0 +1,17 @@
+config {
+    type: "table",
+    name: "totalProductSales",
+    schema: "mart",
+    description: "information on total sales on each product throghout time"
+}
+SELECT
+orders.productID,
+products.productName,
+products.categoryID,
+products.categoryName,
+COUNT(orders.productID) AS totalItemsSold,
+SUM (orders.unitProfit) AS totalProfit
+FROM ${ref("clean", "orders")} AS orders 
+JOIN ${ref("clean", "products")} AS products ON orders.productID = products.productID 
+GROUP BY 1,2,3,4
+ORDER BY productID
