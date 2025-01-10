@@ -9,9 +9,10 @@ orders.productID,
 products.productName,
 products.categoryID,
 products.categoryName,
+orders.orderDate,
 COUNT(orders.productID) AS totalItemsSold,
 SUM (orders.unitProfit) AS totalProfit
 FROM ${ref("clean", "orders")} AS orders 
 JOIN ${ref("clean", "products")} AS products ON orders.productID = products.productID 
-GROUP BY 1,2,3,4
+GROUP BY 1,2,3,4,5
 ORDER BY productID
