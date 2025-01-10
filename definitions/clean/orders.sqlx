@@ -12,10 +12,8 @@ SELECT
     CAST(orders.invoiceDate AS DATE) AS orderDate,
     CAST(order_information.quantity AS INT64) AS quantity,
     CAST(order_information.unitPrice AS FLOAT64) AS unitPrice,
-    CAST(order_information.lineProfit AS FLOAT64) AS unitProfit,
-    SUM(CAST(order_information.quantity AS FLOAT64) * CAST(order_information.lineProfit AS FLOAT64)) AS subtotalProfit
+    CAST(order_information.lineProfit AS FLOAT64) AS subtotalProfit,
   FROM
     ${ref("raw_wwi", "invoices")} AS orders
   INNER JOIN ${ref("raw_wwi", "invoiceLines")} AS order_information ON orders.invoiceID = order_information.invoiceID
-  GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
   ORDER BY productID
