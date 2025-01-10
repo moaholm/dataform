@@ -7,6 +7,7 @@ config {
 SELECT
 customers.customerID,
 customers.customerName,
+customers.customerCategoryName,
 customers.postalCode,
 SUM(orders.quantity) AS totalNrOfItems,
 COUNT(customers.customerID) AS totalNrOfOrders,
@@ -14,5 +15,5 @@ ROUND(SUM(orders.subtotalProfit) / COUNT(orders.customerID), 3) AS averageProfit
 SUM(orders.subtotalProfit) AS totalProfitOnCustomer
 FROM ${ref("clean", "customers")} AS customers
 JOIN ${ref("clean", "orders")} AS orders ON orders.customerID = customers.customerID
-GROUP BY customerID, customerName, postalCode
+GROUP BY customerID, customerName, customerCategoryName, postalCode
 ORDER BY customerID

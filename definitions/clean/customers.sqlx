@@ -6,12 +6,14 @@ config {
 }
 
 SELECT
-    customerID,
-    customerName,
-    phoneNumber,
-    deliveryAddressLine1 AS addressLine1,
-    deliveryAddressLine2 AS addressLine2,
-    deliveryPostalCode AS postalCode,
-    REGEXP_EXTRACT(customerName, r'\(([^)]+)\)') AS city
+    customers.customerID,
+    customers.customerName,
+    customerCategory.customerCategoryName,
+    customers.phoneNumber,
+    customers.deliveryAddressLine1 AS addressLine1,
+    customers.deliveryAddressLine2 AS addressLine2,
+    customers.deliveryPostalCode AS postalCode,
+    REGEXP_EXTRACT(customers.customerName, r'\(([^)]+)\)') AS city
 FROM
-    ${ref("raw_wwi", "customers")}
+    ${ref("raw_wwi", "customers")} AS customers
+JOIN ${ref("raw_wwi", "customerCategory")} AS customerCategory ON customerCategory.customerCategoryID = customers.customerCategoryID
